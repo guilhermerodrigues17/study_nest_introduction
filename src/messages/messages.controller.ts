@@ -9,7 +9,7 @@ export class MessagesController {
     }
 
     @Get(':id')
-    findOne(@Param() id: number): string {
-        return 'Return one message';
+    findOne(@Param() id: string): string {
+        return `Return one message with id ${id}`;
     }
 }
