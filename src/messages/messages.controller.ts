@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 
 @Controller('messages')
 export class MessagesController {
@@ -25,5 +25,10 @@ export class MessagesController {
             id,
             ...body
         };
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string): string {
+        return `REMOVE the message with id ${id}`;
     }
 }
