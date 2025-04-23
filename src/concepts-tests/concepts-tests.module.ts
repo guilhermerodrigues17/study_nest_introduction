@@ -4,6 +4,6 @@ import { ConceptsTestsService } from './concepts-tests.service';
 
 @Module({
   controllers: [ConceptsTestsController],
-  providers: [ConceptsTestsService]
+  providers: [ConceptsTestsService],
 })
-export class ConceptsTestsModule { }
+export class ConceptsTestsModule {}
