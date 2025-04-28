@@ -17,35 +17,34 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
-  findAll(@Query() pagination: { limit: number; offset: number }): string {
+  findAll(@Query() pagination: { limit: number; offset: number }) {
     const { limit = 10, offset = 0 } = pagination;
-    return `Return all messages. Limit: ${limit}, Offset: ${offset}, Hello: ${this.messagesService.getHello()}`;
+    return this.messagesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    return `Return one message with id ${id}`;
+  findOne(@Param('id') id: string) {
+    return this.messagesService.findOne(id);
   }
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  createMessage(@Body() message: string): string {
-    return message;
+  createMessage(@Body() message: any) {
+    return this.messagesService.create(message);
   }
 
   @Patch(':id')
   updateMessage(
     @Param('id') id: string,
     @Body() body: { message: string },
-  ): object {
-    return {
-      id,
-      ...body,
-    };
+  ): string {
+    this.messagesService.update(id, body);
+    return `UPDATED the message with id ${id}`;
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): string {
+    this.messagesService.remove(id);
     return `REMOVE the message with id ${id}`;
   }
 }
