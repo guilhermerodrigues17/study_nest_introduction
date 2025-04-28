@@ -11,6 +11,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('messages')
 export class MessagesController {
@@ -18,7 +20,7 @@ export class MessagesController {
 
   @Get()
   findAll(@Query() pagination: { limit: number; offset: number }) {
-    const { limit = 10, offset = 0 } = pagination;
+    const { limit = 10, offset = 0 } = pagination; //eslint-disable-line
     return this.messagesService.findAll();
   }
 
@@ -29,13 +31,16 @@ export class MessagesController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  createMessage(@Body() message: any) {
-    return this.messagesService.create(message);
+  createMessage(@Body() createMessageDto: CreateMessageDto) {
+    return this.messagesService.create(createMessageDto);
   }
 
   @Patch(':id')
-  updateMessage(@Param('id') id: string, @Body() body: { message: string }) {
-    const updatedMessage = this.messagesService.update(id, body);
+  updateMessage(
+    @Param('id') id: string,
+    @Body() updateMessageDto: UpdateMessageDto,
+  ) {
+    const updatedMessage = this.messagesService.update(id, updateMessageDto);
     return updatedMessage;
   }
 
