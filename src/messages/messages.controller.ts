@@ -34,12 +34,9 @@ export class MessagesController {
   }
 
   @Patch(':id')
-  updateMessage(
-    @Param('id') id: string,
-    @Body() body: { message: string },
-  ): string {
-    this.messagesService.update(id, body);
-    return `UPDATED the message with id ${id}`;
+  updateMessage(@Param('id') id: string, @Body() body: { message: string }) {
+    const updatedMessage = this.messagesService.update(id, body);
+    return updatedMessage;
   }
 
   @Delete(':id')
