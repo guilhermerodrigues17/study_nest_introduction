@@ -22,8 +22,8 @@ export class MessagesService {
     return this.messages;
   }
 
-  findOne(id: string) {
-    const message = this.messages.find((item) => item.id === +id);
+  findOne(id: number) {
+    const message = this.messages.find((item) => item.id === id);
 
     if (message) return message;
 
@@ -44,9 +44,9 @@ export class MessagesService {
     return newMessage;
   }
 
-  update(id: string, updateMessageDto: UpdateMessageDto) {
+  update(id: number, updateMessageDto: UpdateMessageDto) {
     const existentMessageIndex = this.messages.findIndex(
-      (item) => item.id === +id,
+      (item) => item.id === id,
     );
 
     if (existentMessageIndex < 0) {
@@ -63,9 +63,9 @@ export class MessagesService {
     return this.messages[existentMessageIndex];
   }
 
-  remove(id: string) {
+  remove(id: number) {
     const existentMessageIndex = this.messages.findIndex(
-      (item) => item.id === +id,
+      (item) => item.id === id,
     );
 
     if (existentMessageIndex < 0) {
