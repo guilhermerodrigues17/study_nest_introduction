@@ -1,5 +1,9 @@
-export class UpdateMessageDto {
-  readonly content?: string;
-  readonly from?: string;
-  readonly to?: string;
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateMessageDto } from './create-message.dto';
+import { IsBoolean, IsOptional } from 'class-validator';
+
+export class UpdateMessageDto extends PartialType(CreateMessageDto) {
+  @IsBoolean()
+  @IsOptional()
+  readonly read?: boolean;
 }
