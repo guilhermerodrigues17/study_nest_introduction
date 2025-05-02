@@ -52,23 +52,20 @@ export class MessagesService {
     return this.messageRepository.save(message);
   }
 
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    const existentMessageIndex = this.messages.findIndex(
-      (item) => item.id === id,
-    );
-
-    if (existentMessageIndex < 0) {
-      throw new NotFoundException('Message not found...');
-    }
-
-    const existentMessage = this.messages[existentMessageIndex];
-
-    this.messages[existentMessageIndex] = {
-      ...existentMessage,
-      ...updateMessageDto,
+  async update(id: number, updateMessageDto: UpdateMessageDto) {
+    const partialUpdateMessageDto = {
+      read: updateMessageDto?.read,
+      content: updateMessageDto?.content,
     };
 
-    return this.messages[existentMessageIndex];
+    const existentMessage = await this.messageRepository.preload({
+      id,
+      ...partialUpdateMessageDto,
+    });
+
+    if (!existentMessage) throw new NotFoundException('Message not found...');
+
+    return this.messageRepository.save(existentMessage);
   }
 
   async remove(id: number) {
