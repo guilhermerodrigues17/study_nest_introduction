@@ -47,8 +47,7 @@ export class MessagesController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): string {
-    this.messagesService.remove(id);
-    return `REMOVE the message with id ${id}`;
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.messagesService.remove(id);
   }
 }
