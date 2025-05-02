@@ -20,9 +20,10 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
-  findAll(@Query() pagination: { limit: number; offset: number }) {
+  async findAll(@Query() pagination: { limit: number; offset: number }) {
     const { limit = 10, offset = 0 } = pagination; //eslint-disable-line
-    return this.messagesService.findAll();
+    const message = await this.messagesService.findAll();
+    return message;
   }
 
   @Get(':id')
