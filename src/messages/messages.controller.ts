@@ -47,7 +47,7 @@ export class MessagesController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.messagesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.messagesService.remove(id);
   }
 }
