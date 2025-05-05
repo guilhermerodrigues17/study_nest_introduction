@@ -1,7 +1,10 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,11 +17,13 @@ export class Message {
   @Column({ type: 'varchar', length: 255 })
   content: string;
 
-  @Column({ type: 'varchar', length: 50 })
-  from: string;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'from' })
+  from: User;
 
-  @Column({ type: 'varchar', length: 50 })
-  to: string;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'to' })
+  to: User;
 
   @Column({ default: false })
   read: boolean;
