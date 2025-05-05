@@ -14,15 +14,15 @@ import {
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
-  async findAll(@Query() pagination: { limit: number; offset: number }) {
-    const { limit = 10, offset = 0 } = pagination; //eslint-disable-line
-    const message = await this.messagesService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    const message = await this.messagesService.findAll(paginationDto);
     return message;
   }
 
