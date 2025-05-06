@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { TimingConnectionInterceptor } from 'src/common/interceptors/timing-connection.interceptor';
 
 @Controller('users')
 export class UserController {
@@ -21,6 +23,7 @@ export class UserController {
   }
 
   @Get()
+  @UseInterceptors(TimingConnectionInterceptor)
   findAll() {
     return this.userService.findAll();
   }
