@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -27,7 +26,7 @@ export class MessagesController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: number) {
     return this.messagesService.findOne(id);
   }
 
@@ -39,7 +38,7 @@ export class MessagesController {
 
   @Patch(':id')
   updateMessage(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() updateMessageDto: UpdateMessageDto,
   ) {
     const updatedMessage = this.messagesService.update(id, updateMessageDto);
@@ -47,7 +46,7 @@ export class MessagesController {
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: number) {
     await this.messagesService.remove(id);
   }
 }
