@@ -9,16 +9,14 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { AuthTokenInterceptor } from 'src/common/interceptors/auth-token.interceptor';
 
 @Controller('messages')
-@UseInterceptors(AuthTokenInterceptor)
+// @UseInterceptors(AuthTokenInterceptor)
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
