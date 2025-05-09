@@ -12,13 +12,15 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TimingConnectionInterceptor } from 'src/common/interceptors/timing-connection.interceptor';
+import { UrlParam } from 'src/common/params/url-param.decorator';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto, @UrlParam() url: string) {
+    console.log(url);
     return this.userService.create(createUserDto);
   }
 
