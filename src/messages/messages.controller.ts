@@ -9,14 +9,17 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IsAdminGuard } from 'src/common/guards/is-admin.guard';
 
-@Controller('messages')
 // @UseInterceptors(AuthTokenInterceptor)
+@UseGuards(IsAdminGuard)
+@Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
