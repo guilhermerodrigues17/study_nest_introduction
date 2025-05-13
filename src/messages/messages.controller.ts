@@ -40,9 +40,9 @@ export class MessagesController {
 
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
-    console.log(this.serverTestString);
-    console.log(this.onlyLowercaseLetters.execute(this.serverTestString));
-    console.log(this.removeSpaces.execute(this.serverTestString));
+    // console.log(this.serverTestString);
+    // console.log(this.onlyLowercaseLetters.execute(this.serverTestString));
+    // console.log(this.removeSpaces.execute(this.serverTestString));
     const message = await this.messagesService.findAll(paginationDto);
     return message;
   }
