@@ -9,25 +9,31 @@ import {
   REMOVE_SPACES_REGEX,
   SERVER_TEST,
 } from './messages.constant';
-import { OnlyLowercaseLettersRegex } from 'src/common/regex/only-lowercase-letters.regex';
-import { RemoveSpacesRegex } from 'src/common/regex/remove-spaces.regex';
+import { RegexFactory } from 'src/common/regex/regex.factory';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Message]), UserModule],
   controllers: [MessagesController],
   providers: [
     MessagesService,
+    RegexFactory,
     {
       provide: SERVER_TEST,
       useValue: 'Server Test: NestJS',
     },
     {
       provide: ONLY_LOWERCASE_LETTERS_REGEX,
-      useClass: OnlyLowercaseLettersRegex,
+      useFactory: (regexFactory: RegexFactory) => {
+        return regexFactory.create('OnlyLowercaseLettersRegex');
+      },
+      inject: [RegexFactory],
     },
     {
       provide: REMOVE_SPACES_REGEX,
-      useClass: RemoveSpacesRegex,
+      useFactory: (regexFactory: RegexFactory) => {
+        return regexFactory.create('RemoveSpacesRegex');
+      },
+      inject: [RegexFactory],
     },
   ],
 })
