@@ -13,10 +13,22 @@ import { SimpleMiddleware } from 'src/common/middlewares/simple.middleware';
 import { APP_FILTER } from '@nestjs/core';
 import { MyExceptionFilter } from 'src/common/filters/my-exception.filter';
 import { ConfigModule } from '@nestjs/config';
+import * as Joi from '@hapi/joi';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        DATABASE_TYPE: Joi.required(),
+        DATABASE_HOST: Joi.required(),
+        DATABASE_PORT: Joi.number().default(5432),
+        DATABASE_USERNAME: Joi.required(),
+        DATABASE_DATABASE: Joi.required(),
+        DATABASE_PASSWORD: Joi.required(),
+        DATABASE_AUTO_LOAD_ENTITIES: Joi.number().min(0).max(1).default(0),
+        DATABASE_SYNCHRONIZE: Joi.number().min(0).max(1).default(0),
+      }),
+    }),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as 'postgres',
       host: process.env.DATABASE_HOST,
