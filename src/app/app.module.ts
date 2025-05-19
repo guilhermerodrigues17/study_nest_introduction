@@ -15,6 +15,7 @@ import { MyExceptionFilter } from 'src/common/filters/my-exception.filter';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import * as Joi from '@hapi/joi';
 import appConfig from './app.config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import appConfig from './app.config';
     }),
     MessagesModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
