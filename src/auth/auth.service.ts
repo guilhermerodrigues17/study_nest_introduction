@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashingProtocolService } from './hashing/hashing-protocol.service';
+import jwtConfig from './config/jwt.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,8 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingProtocolService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   async login(loginDto: LoginDto) {
