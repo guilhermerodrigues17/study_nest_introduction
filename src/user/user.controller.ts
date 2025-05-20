@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TimingConnectionInterceptor } from 'src/common/interceptors/timing-connection.interceptor';
 import { UrlParam } from 'src/common/params/url-param.decorator';
+import { AuthTokenGuard } from 'src/auth/guards/auth-token.guard';
 
+@UseGuards(AuthTokenGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
