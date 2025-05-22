@@ -16,16 +16,16 @@ import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IsAdminGuard } from 'src/common/guards/is-admin.guard';
 import { RegexProtocol } from 'src/common/regex/regex.protocol';
 import {
   ONLY_LOWERCASE_LETTERS_REGEX,
   REMOVE_SPACES_REGEX,
   SERVER_TEST,
 } from './messages.constant';
+import { AuthTokenGuard } from 'src/auth/guards/auth-token.guard';
+import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
-// @UseInterceptors(AuthTokenInterceptor)
-@UseGuards(IsAdminGuard)
 @Controller('messages')
 export class MessagesController {
   constructor(
@@ -40,9 +40,6 @@ export class MessagesController {
 
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
-    // console.log(this.serverTestString);
-    // console.log(this.onlyLowercaseLetters.execute(this.serverTestString));
-    // console.log(this.removeSpaces.execute(this.serverTestString));
     const message = await this.messagesService.findAll(paginationDto);
     return message;
   }
@@ -52,23 +49,37 @@ export class MessagesController {
     return this.messagesService.findOne(id);
   }
 
+  @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  createMessage(@Body() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
+  createMessage(
+    @Body() createMessageDto: CreateMessageDto,
+    @TokenPayloadParam() tokenPayloadDto: TokenPayloadDto,
+  ) {
+    return this.messagesService.create(createMessageDto, tokenPayloadDto);
   }
 
+  @UseGuards(AuthTokenGuard)
   @Patch(':id')
   updateMessage(
     @Param('id') id: number,
     @Body() updateMessageDto: UpdateMessageDto,
+    @TokenPayloadParam() tokenPayloadDto: TokenPayloadDto,
   ) {
-    const updatedMessage = this.messagesService.update(id, updateMessageDto);
+    const updatedMessage = this.messagesService.update(
+      id,
+      updateMessageDto,
+      tokenPayloadDto,
+    );
     return updatedMessage;
   }
 
+  @UseGuards(AuthTokenGuard)
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    await this.messagesService.remove(id);
+  async remove(
+    @Param('id') id: number,
+    @TokenPayloadParam() tokenPayloadDto: TokenPayloadDto,
+  ) {
+    await this.messagesService.remove(id, tokenPayloadDto);
   }
 }
