@@ -122,7 +122,7 @@ export class MessagesService {
     if (!existentMessage) throw new NotFoundException('Message not found...');
 
     if (existentMessage.from.id !== tokenPayload.sub) {
-      throw new ForbiddenException('You can only update your own messages...');
+      throw new ForbiddenException('You can only remove your own messages...');
     }
 
     await this.messageRepository.remove(existentMessage);
