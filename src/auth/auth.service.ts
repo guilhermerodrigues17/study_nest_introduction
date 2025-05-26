@@ -7,6 +7,8 @@ import { HashingProtocolService } from './hashing/hashing-protocol.service';
 import jwtConfig from './config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { TokenPayloadDto } from './dto/token-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,21 +37,56 @@ export class AuthService {
       throw new UnauthorizedException("Passwords don't match!");
     }
 
-    const accessToken = await this.jwtService.signAsync(
+    return await this.createTokens(user);
+  }
+
+  async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const { sub } = await this.jwtService.verifyAsync<TokenPayloadDto>(
+        refreshTokenDto.refreshToken,
+        this.jwtConfiguration,
+      );
+
+      const user = await this.userRepository.findOneBy({ id: sub });
+
+      if (!user) throw new Error('User not found...');
+
+      return this.createTokens(user);
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  private async createTokens(user: User) {
+    const accessToken = await this.signJwtAsync<Partial<User>>(
+      user.id,
+      this.jwtConfiguration.jwtTtl,
+      { email: user.email },
+    );
+
+    const refreshToken = await this.signJwtAsync(
+      user.id,
+      this.jwtConfiguration.jwtRefreshTtl,
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  private async signJwtAsync<T>(sub: number, expiresIn: number, payload?: T) {
+    return await this.jwtService.signAsync(
       {
-        sub: user.id,
-        email: user.email,
+        sub,
+        ...payload,
       },
       {
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
         secret: this.jwtConfiguration.secret,
-        expiresIn: this.jwtConfiguration.jwtTtl,
+        expiresIn,
       },
     );
-
-    return {
-      accessToken,
-    };
   }
 }
