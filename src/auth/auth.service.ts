@@ -24,9 +24,12 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.userRepository.findOneBy({
       email: loginDto.email,
+      active: true,
     });
 
-    if (!user) throw new UnauthorizedException('Non-existing user!');
+    if (!user) {
+      throw new UnauthorizedException('Unauthorized or non-existent user...');
+    }
 
     const passwordIsValid: boolean = await this.hashingService.compare(
       loginDto.password,
@@ -47,9 +50,12 @@ export class AuthService {
         this.jwtConfiguration,
       );
 
-      const user = await this.userRepository.findOneBy({ id: sub });
+      const user = await this.userRepository.findOneBy({
+        id: sub,
+        active: true,
+      });
 
-      if (!user) throw new Error('User not found...');
+      if (!user) throw new Error('Unauthorized or non-existent user...');
 
       return this.createTokens(user);
     } catch (error) {
