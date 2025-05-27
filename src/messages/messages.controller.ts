@@ -25,7 +25,11 @@ import {
 import { AuthTokenGuard } from 'src/auth/guards/auth-token.guard';
 import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { RoutePolicyGuard } from 'src/auth/guards/route-policy.guard';
+import { SetRoutePolicy } from 'src/auth/decorators/set-route-policy.decorator';
+import { RoutePolicies } from 'src/auth/enum/route-policies.enum';
 
+@UseGuards(RoutePolicyGuard)
 @Controller('messages')
 export class MessagesController {
   constructor(
@@ -39,6 +43,7 @@ export class MessagesController {
   ) {}
 
   @Get()
+  @SetRoutePolicy(RoutePolicies.findAllMessagesAdmin)
   async findAll(@Query() paginationDto: PaginationDto) {
     const message = await this.messagesService.findAll(paginationDto);
     return message;
