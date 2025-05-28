@@ -11,7 +11,6 @@ import {
   UploadedFile,
   ParseFilePipeBuilder,
   HttpStatus,
-  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,8 +21,6 @@ import { AuthTokenGuard } from 'src/auth/guards/auth-token.guard';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as path from 'path';
-import * as fs from 'fs/promises';
 
 @Controller('users')
 export class UserController {
@@ -70,7 +67,7 @@ export class UserController {
   @UseGuards(AuthTokenGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Post('upload-picture')
-  async uploadPicture(
+  uploadPicture(
     @TokenPayloadParam() tokenPayloadDto: TokenPayloadDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
@@ -86,28 +83,6 @@ export class UserController {
     )
     file?: Express.Multer.File,
   ) {
-    if (!file) {
-      throw new BadRequestException('It is necessary to send some file...');
-    }
-
-    if (file.size < 1024) {
-      throw new BadRequestException('File is too small');
-    }
-
-    const result: string[] = [];
-
-    const fileExtension = path
-      .extname(file.originalname)
-      .toLowerCase()
-      .substring(1);
-
-    const fileName = `${tokenPayloadDto.sub}.${fileExtension}`;
-    const fileFullPath = path.resolve(process.cwd(), 'pictures', fileName);
-
-    await fs.writeFile(fileFullPath, file.buffer);
-
-    result.push(fileFullPath);
-
-    return result;
+    return this.userService.uploadPicture(tokenPayloadDto, file);
   }
 }
