@@ -16,6 +16,8 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import * as Joi from '@hapi/joi';
 import appConfig from './app.config';
 import { AuthModule } from 'src/auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -46,6 +48,10 @@ import { AuthModule } from 'src/auth/auth.module';
           synchronize: appConfigurations.database.synchronize,
         };
       },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: path.resolve(__dirname, '..', '..', 'pictures'),
+      serveRoot: '/pictures',
     }),
     MessagesModule,
     UserModule,
