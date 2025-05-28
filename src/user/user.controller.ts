@@ -87,7 +87,7 @@ export class UserController {
     file?: Express.Multer.File,
   ) {
     if (!file) {
-      throw new BadRequestException('File is too small');
+      throw new BadRequestException('It is necessary to send some file...');
     }
 
     if (file.size < 1024) {
