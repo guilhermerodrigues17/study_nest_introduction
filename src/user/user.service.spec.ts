@@ -5,7 +5,13 @@ import { HashingProtocolService } from 'src/auth/hashing/hashing-protocol.servic
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -23,6 +29,7 @@ describe('UserService', () => {
             save: jest.fn(),
             findOneBy: jest.fn(),
             find: jest.fn(),
+            preload: jest.fn(),
           },
         },
         {
@@ -134,6 +141,70 @@ describe('UserService', () => {
       const result = await userService.findAll();
 
       expect(result).toEqual(usersMock);
+    });
+  });
+
+  describe('update', () => {
+    it('should update user data if it exists and is authorized', async () => {
+      const userId = 1;
+      const updateUserDto: UpdateUserDto = {
+        name: 'name',
+        password: 'password',
+      };
+      const tokenPayload = { sub: userId };
+      const passwordHash = 'passwordHash';
+      const updatedUser = {
+        id: userId,
+        name: updateUserDto.name,
+        passwordHash,
+      };
+
+      jest.spyOn(hashingService, 'hash').mockResolvedValue(passwordHash);
+      jest
+        .spyOn(userRepository, 'preload')
+        .mockResolvedValue(updatedUser as any);
+
+      jest.spyOn(userRepository, 'save').mockResolvedValue(updatedUser as any);
+
+      const result = await userService.update(
+        userId,
+        updateUserDto,
+        tokenPayload as any,
+      );
+
+      expect(hashingService.hash).toHaveBeenCalledWith(updateUserDto.password);
+      expect(userRepository.preload).toHaveBeenCalledWith({
+        id: userId,
+        name: updateUserDto.name,
+        passwordHash,
+      });
+      expect(userRepository.save).toHaveBeenCalledWith(updatedUser);
+      expect(result).toEqual(updatedUser);
+    });
+
+    it('should throw NotFoundException if user doesnt exist', async () => {
+      const userId = 1;
+      const updateUserDto = {} as UpdateUserDto;
+      const tokenPayload = {} as TokenPayloadDto;
+
+      jest.spyOn(userRepository, 'preload').mockResolvedValue(undefined);
+
+      await expect(
+        userService.update(userId, updateUserDto, tokenPayload),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException if user is not authorized', async () => {
+      const userId = 1;
+      const updateUserDto = {} as UpdateUserDto;
+      const tokenPayload = { sub: 2 } as TokenPayloadDto;
+      const user = { id: userId, name: 'name' };
+
+      jest.spyOn(userRepository, 'preload').mockResolvedValue(user as User);
+
+      await expect(
+        userService.update(userId, updateUserDto, tokenPayload),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });
