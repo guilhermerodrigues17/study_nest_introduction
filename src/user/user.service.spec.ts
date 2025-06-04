@@ -22,6 +22,7 @@ describe('UserService', () => {
             create: jest.fn(),
             save: jest.fn(),
             findOneBy: jest.fn(),
+            find: jest.fn(),
           },
         },
         {
@@ -114,6 +115,25 @@ describe('UserService', () => {
 
     it('should throw NotFoundException if user doesnt exist', async () => {
       await expect(userService.findOne(1)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all users from db', async () => {
+      const usersMock: User[] = [
+        {
+          id: 1,
+          email: 'email@email.com',
+          name: 'name',
+          passwordHash: 'passwordHash',
+        } as User,
+      ];
+
+      jest.spyOn(userRepository, 'find').mockResolvedValue(usersMock);
+
+      const result = await userService.findAll();
+
+      expect(result).toEqual(usersMock);
     });
   });
 });
