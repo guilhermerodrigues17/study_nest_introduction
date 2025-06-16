@@ -30,6 +30,7 @@ describe('UserService', () => {
             findOneBy: jest.fn(),
             find: jest.fn(),
             preload: jest.fn(),
+            remove: jest.fn(),
           },
         },
         {
@@ -205,6 +206,48 @@ describe('UserService', () => {
       await expect(
         userService.update(userId, updateUserDto, tokenPayload),
       ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove an user', async () => {
+      const userId = 1;
+      const tokenPayload = { sub: userId } as TokenPayloadDto;
+      const user = { id: userId, name: 'name' };
+
+      jest.spyOn(userService, 'findOne').mockResolvedValue(user as User);
+      jest.spyOn(userRepository, 'remove').mockResolvedValue(user as User);
+
+      const result = await userService.remove(userId, tokenPayload);
+
+      expect(userService.findOne).toHaveBeenCalledWith(userId);
+      expect(userRepository.remove).toHaveBeenCalledWith(user);
+      expect(result).toEqual(user);
+    });
+
+    it('should throw ForbiddenException if user is not authorized', async () => {
+      const userId = 1;
+      const tokenPayload = { sub: 2 } as TokenPayloadDto;
+      const user = { id: userId, name: 'name' };
+
+      jest.spyOn(userService, 'findOne').mockResolvedValue(user as User);
+
+      await expect(userService.remove(userId, tokenPayload)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('should throw NotFoundException if user doesnt exist', async () => {
+      const userId = 1;
+      const tokenPayload = { sub: userId } as TokenPayloadDto;
+
+      jest
+        .spyOn(userService, 'findOne')
+        .mockRejectedValue(new NotFoundException());
+
+      await expect(userService.remove(userId, tokenPayload)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
