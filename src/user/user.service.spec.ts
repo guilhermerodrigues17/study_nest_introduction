@@ -6,12 +6,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import * as path from 'path';
+import * as fs from 'fs/promises';
+
+jest.mock('fs/promises');
 
 describe('UserService', () => {
   let userService: UserService;
@@ -248,6 +253,63 @@ describe('UserService', () => {
       await expect(userService.remove(userId, tokenPayload)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('uploadPicture', () => {
+    it('should save the image and update the user', async () => {
+      const mockFile = {
+        originalname: 'test.png',
+        size: 2000,
+        buffer: Buffer.from('content'),
+      } as Express.Multer.File;
+
+      const mockUser = {
+        id: 1,
+        name: 'name',
+        email: 'email@email.com',
+      } as User;
+
+      const mockUserWithPicture = {
+        ...mockUser,
+        picture: '1.png',
+      };
+
+      const mockTokenPayload = { sub: 1 } as TokenPayloadDto;
+      const mockFilePath = path.resolve(process.cwd(), 'pictures', '1.png');
+
+      jest.spyOn(userService, 'findOne').mockResolvedValue(mockUser);
+      jest.spyOn(userRepository, 'save').mockResolvedValue(mockUserWithPicture);
+
+      const result = await userService.uploadPicture(
+        mockTokenPayload,
+        mockFile,
+      );
+
+      expect(fs.writeFile).toHaveBeenCalledWith(mockFilePath, mockFile.buffer);
+      expect(userRepository.save).toHaveBeenCalledWith(mockUserWithPicture);
+      expect(result).toEqual(mockUserWithPicture);
+    });
+
+    it('should throw BadRequestException if the file is not sent', async () => {
+      const mockTokenPayload = { sub: 1 } as TokenPayloadDto;
+
+      await expect(userService.uploadPicture(mockTokenPayload)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException if the file size is smaller than 1024 byes', async () => {
+      const mockFile = {
+        originalname: 'test.png',
+        size: 500,
+        buffer: Buffer.from('content'),
+      } as Express.Multer.File;
+      const mockTokenPayload = { sub: 1 } as TokenPayloadDto;
+
+      await expect(
+        userService.uploadPicture(mockTokenPayload, mockFile),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
