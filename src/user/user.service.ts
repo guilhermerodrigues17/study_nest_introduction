@@ -96,11 +96,7 @@ export class UserService {
   }
 
   async remove(id: number, tokenPayloadDto: TokenPayloadDto) {
-    const userFound = await this.userRepository.findOneBy({ id });
-
-    if (!userFound) {
-      throw new NotFoundException('User not found...');
-    }
+    const userFound = await this.findOne(id);
 
     if (userFound.id !== tokenPayloadDto.sub) {
       throw new ForbiddenException('You can only change your own data...');
